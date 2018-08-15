@@ -11,14 +11,15 @@ static void initModesAndClock(void) {
 	ME.RUN[0].R = 0x001F0074; /* RUN0 cfg: 16MHzIRCON,OSC0ON,PLL0ON,syclk=PLL0 */
 	
 	ME.RUNPC[0].R = 0x000000FE; /* Peri. Cfg. 1 settings: only run in RUN0 mode */
+	//ME.RUNPC[1].R = 0x00000010;
 	
 	ME.PCTL[68].R = 0x00;
 	
-	//ME.PCTL[48].R = 0x00; /* LINflex0 Uart0 */
+	ME.PCTL[48].R = 0x00; /* LINflex0 Uart0 */
 	
-	//ME.PCTL[49].R = 0x00; /* LINflex1 Uart1 */
+	ME.PCTL[49].R = 0x00; /* LINflex1 Uart1 */
 	
-   //ME.PCTL[16].R = 0x00; /* CANflex0  */
+    //ME.PCTL[16].R = 0x00; /* CANflex0  */
 	
 	/* Mode Transition to enter RUN0 mode: */
 	ME.MCTL.R = 0x40005AF0; /* Enter RUN0 Mode & Key */

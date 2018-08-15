@@ -4,7 +4,7 @@
 
 
 void uartPrintInit(void);
-
+void OSsend_string(char *putchar); 
 void Uart_Printf(const char *fmt,...);//post massage to UartQ
 
 #endif
