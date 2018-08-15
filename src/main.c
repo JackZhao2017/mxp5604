@@ -16,7 +16,7 @@ void delay(int ms)
 }
 CAN_RXMSG msg;
 int main(void) {
-  int flag=0;	
+  int flag=0,ret=0;	
   sysclockInit();
   
   ledInit();
@@ -25,7 +25,7 @@ int main(void) {
   
   uartInit();
   
-  //initCan();
+  initCan();
   
   while(1) {
 	delay(1000);
@@ -41,8 +41,12 @@ int main(void) {
 		LED_ON(LED0);
 		LED_OFF(LED1);	
 	}
-	//RecieveMsg(&msg);
-//	TransmitMsg();
+	ret = RecieveMsg(&msg);
+	if(ret)
+	{
+		TransmitMsg();
+	}
+	
 	Uart_SendData("start run\r\n",strlen("start run\r\n"));
 	OSsend_string("start run\r\n");
   }
