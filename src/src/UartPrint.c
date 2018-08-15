@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-static  unsigned char  pUartBuf[200];
+static   char  pUartBuf[200];
 
 static void init_SIU(void)
 {
@@ -57,7 +57,7 @@ void uartPrintInit(void)
 	init_SIU();		
 }
 
-static void UART1_TX(unsigned char data)
+static void UART1_TX(char data)
 {
   LINFLEX_1.BDRL.B.DATA0 = data;        
   while(LINFLEX_1.UARTSR.B.DTF == 0) {} 
@@ -66,7 +66,7 @@ static void UART1_TX(unsigned char data)
 
 #define putch(x)  UART1_TX(x)
 
-static void OSsend_string(unsigned char *putchar) 
+void OSsend_string(char *putchar) 
 {
   while(*putchar!=0x00)      
   {
