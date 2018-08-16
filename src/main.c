@@ -11,12 +11,14 @@
 #include "CRC8.h"
 
 
+#include "UJA1078.h"
+
 void delay(int ms)
 {   
    int ii,jj;
    if (ms<1) ms=1;
    for(ii=0;ii<ms;ii++)
-     for(jj=0;jj<2000;jj++){}        
+     for(jj=0;jj<1500;jj++){}        
 }
 CAN_RXMSG can_rxmsg;
 
@@ -69,12 +71,16 @@ int main(void) {
   
   msgBufferInit();
  
- 
+  UJA1078_Init();
   
+
+  delay(10000);
+
+  UJA1078_GOIN_NOMAL();
+
+  delay(10000);  
   while(1) { 
-      // delay(1000);
-      // TransmitMsg();
-    	ret = RecieveMsg(&can_rxmsg);
+     	ret = RecieveMsg(&can_rxmsg);
     	if(ret==1)
     	{
     		if(can_rxmsg.ID==0x60a)
@@ -85,7 +91,7 @@ int main(void) {
             }
            	if(PutCanMsgToBuffer(&can_rxmsg)){
             	UartSendWmrmsg();
-            	//TransmitMsg();
+            	TransmitMsg();
         	  }		
     	}
     	else if (ret==2)
