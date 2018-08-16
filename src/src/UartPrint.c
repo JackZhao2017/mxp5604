@@ -63,6 +63,17 @@ static void UART1_TX(char data)
   while(LINFLEX_1.UARTSR.B.DTF == 0) {} 
   LINFLEX_1.UARTSR.B.DTF = 1;         
 }
+void Uart1_SendData( char *data,int len)
+{
+	int index=0;
+	int size=len;
+	while(index<size)
+	{
+		UART1_TX(data[index]);
+		index+=1;
+	}
+}
+
 
 #define putch(x)  UART1_TX(x)
 

@@ -7,6 +7,10 @@
 #include "can.h"
 
 
+
+#include "CRC8.h"
+
+
 void delay(int ms)
 {   
    int ii,jj;
@@ -14,9 +18,43 @@ void delay(int ms)
    for(ii=0;ii<ms;ii++)
      for(jj=0;jj<2000;jj++){}        
 }
-CAN_RXMSG msg;
+CAN_RXMSG can_rxmsg;
+
+uint8_t g_speed=0;
+
+void resolverCarspeed(uint8_t *buf)
+{
+  uint8_t datalen=buf[0];
+  uint8_t mode =buf[1];
+  uint8_t pid  =buf[2];
+
+  if(mode!=0x41){
+    return ;
+  }
+  if(pid!=0x0d){
+    return ;
+  }
+  g_speed=buf[datalen];	
+}
+
+void UartSendWmrmsg(void)
+{
+    uint8_t i=0;
+    uint8_t sum= (uint8_t)getMsgSum();
+    UartMwrMsg mMwrMsg;
+
+    for(i=0;i<sum;i++){
+        if(GetUartMsgFromBuffer(&mMwrMsg)){
+          Uart1_SendData((char  *)&mMwrMsg,mMwrMsg.TYPE+1);
+        }
+    }
+
+}
+
 int main(void) {
+
   int flag=0,ret=0;	
+
   sysclockInit();
   
   ledInit();
@@ -27,28 +65,33 @@ int main(void) {
   
   initCan();
   
-  while(1) {
-	delay(1000);
-	if(flag)
-	{
-		flag =0;
-		LED_OFF(LED0);
-		LED_ON(LED1);	
-	}
-	else
-	{
-		flag =1 ;
-		LED_ON(LED0);
-		LED_OFF(LED1);	
-	}
-	ret = RecieveMsg(&msg);
-	if(ret)
-	{
-		TransmitMsg();
-	}
-	
-	Uart_SendData("start run\r\n",strlen("start run\r\n"));
-	OSsend_string("start run\r\n");
+  crcInit(LSB,POLY);
+  
+  msgBufferInit();
+ 
+ 
+  
+  while(1) { 
+      // delay(1000);
+      // TransmitMsg();
+    	ret = RecieveMsg(&can_rxmsg);
+    	if(ret==1)
+    	{
+    		if(can_rxmsg.ID==0x60a)
+            {
+                clearBuffer();
+                can_rxmsg.DATA[0] = (uint8_t)setReceiveSize(can_rxmsg.DATA[0]+1);
+                can_rxmsg.DATA[4] = g_speed;
+            }
+           	if(PutCanMsgToBuffer(&can_rxmsg)){
+            	UartSendWmrmsg();
+            	//TransmitMsg();
+        	  }		
+    	}
+    	else if (ret==2)
+    	{
+    		resolverCarspeed(&can_rxmsg.DATA[0]);
+    	}
   }
   return 0;
 }

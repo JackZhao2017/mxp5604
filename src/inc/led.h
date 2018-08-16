@@ -9,6 +9,8 @@ void ledInit(void);
 #define LED2 14
 #define LED3 15
 
+#define SOC_SWITCH 14
+
 #define LED_ON(x);    SIU.GPDO[x].R=0;
 #define LED_OFF(x);   SIU.GPDO[x].R=1;
 
